@@ -5,12 +5,10 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0a0a0c">
 
-  <!-- iOS Fullscreen -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Mi Rutina Pro">
 
-  <!-- Viewport FIX -->
   <meta name="viewport"
     content="width=device-width,
              initial-scale=1,
@@ -18,13 +16,15 @@
              viewport-fit=cover">
 
   <title>Mi Rutina Pro</title>
-
   <link rel="stylesheet" href="styles.css">
 
 </head>
 <body>
 
   <h1>Mi Rutina Pro</h1>
+
+  <!-- Botón superior volver -->
+  <button id="backBtn" onclick="renderHome()">Volver</button>
 
   <div id="app"></div>
 
@@ -35,19 +35,16 @@
 
   <script>
     function scrollToTop() {
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    const btn = document.getElementById("scrollTopBtn");
+    const scrollBtn = document.getElementById("scrollTopBtn");
 
     window.addEventListener("scroll", () => {
       if (window.scrollY > 300) {
-        btn.style.display = "block";
+        scrollBtn.style.display = "block";
       } else {
-        btn.style.display = "none";
+        scrollBtn.style.display = "none";
       }
     });
   </script>
