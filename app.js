@@ -1,5 +1,13 @@
 const app = document.getElementById("app");
 const backBtn = document.getElementById("backBtn");
+const scrollBtn = document.getElementById("scrollTopBtn");
+
+let intervalo = null;
+let tiempoRestante = 0;
+let timerActivoId = null;
+let pausado = false;
+
+const sonido = new Audio("assets/sounds/finish.mp3");
 
 const rutina = [
   {
@@ -75,12 +83,12 @@ function renderHome() {
   backBtn.style.display = "none";
   app.innerHTML = "";
 
-  rutina.forEach((dia, index) => {
+  rutina.forEach((dia, i) => {
     const card = document.createElement("div");
     card.className = "card";
     card.innerHTML = `
       <h2>${dia.nombre}</h2>
-      <button onclick="renderDia(${index})">Entrar</button>
+      <button onclick="renderDia(${i})">Entrar</button>
     `;
     app.appendChild(card);
   });
@@ -90,34 +98,75 @@ function renderDia(index) {
   backBtn.style.display = "block";
   app.innerHTML = `<h2>${rutina[index].nombre}</h2>`;
 
-  rutina[index].ejercicios.forEach(ej => {
+  rutina[index].ejercicios.forEach((ej, i) => {
+    const id = "timer_" + index + "_" + i;
+    const gifNombre = ej.nombre.toLowerCase().replace(/\s/g, "_").replace(/[()]/g, "");
+
     const card = document.createElement("div");
     card.className = "card";
     card.innerHTML = `
+      <img src="assets/gifs/${gifNombre}.gif" onerror="this.style.display='none'">
       <h3>${ej.nombre}</h3>
       <p><strong>Series:</strong> ${ej.series}</p>
       <p><strong>Reps:</strong> ${ej.reps}</p>
-      <button onclick="iniciarTimer(${ej.descanso})">Descanso</button>
-      <h2 id="timer_${ej.nombre.replace(/\s/g, "")}"></h2>
+      <button onclick="iniciarTimer(${ej.descanso}, '${id}')">Descanso</button>
+      <button onclick="pausarTimer()">Pausa / Reanudar</button>
+      <h2 id="${id}"></h2>
     `;
     app.appendChild(card);
   });
 }
 
-let intervalo;
-
-function iniciarTimer(segundos) {
+function iniciarTimer(segundos, id) {
   clearInterval(intervalo);
-  let tiempo = segundos;
-  const sonido = new Audio("assets/sounds/finish.mp3");
+  pausado = false;
+  tiempoRestante = segundos;
+  timerActivoId = id;
+
+  actualizarTimer();
 
   intervalo = setInterval(() => {
-    tiempo--;
-    if (tiempo <= 0) {
-      clearInterval(intervalo);
-      sonido.play();
+    if (!pausado) {
+      tiempoRestante--;
+      actualizarTimer();
+
+      if (tiempoRestante <= 0) {
+        clearInterval(intervalo);
+        sonido.play();
+      }
     }
   }, 1000);
 }
+
+function actualizarTimer() {
+  const el = document.getElementById(timerActivoId);
+  if (!el) return;
+
+  const min = Math.floor(tiempoRestante / 60);
+  const seg = tiempoRestante % 60;
+  el.textContent = `${min}:${seg < 10 ? "0" : ""}${seg}`;
+
+  if (tiempoRestante <= 10) {
+    el.style.color = "red";
+  } else {
+    el.style.color = "";
+  }
+}
+
+function pausarTimer() {
+  pausado = !pausado;
+}
+
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+window.onscroll = function () {
+  if (document.documentElement.scrollTop > 300) {
+    scrollBtn.style.display = "block";
+  } else {
+    scrollBtn.style.display = "none";
+  }
+};
 
 renderHome();
