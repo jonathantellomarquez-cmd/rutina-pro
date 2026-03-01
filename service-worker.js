@@ -1,21 +1,26 @@
-self.addEventListener("install", e => {
-  e.waitUntil(
-    caches.open("rutina-cache").then(cache => {
-      return cache.addAll([
-        "/",
-        "/index.html",
-        "/styles.css",
-        "/app.js",
-        "/manifest.json"
-      ]);
-    })
+const CACHE_NAME = "rutina-pro-v1";
+
+const urlsToCache = [
+  "./",
+  "./index.html",
+  "./styles.css",
+  "./app.js",
+  "./manifest.json",
+  "./icon-192.png",
+  "./icon-512.png",
+  "./assets/sounds/finish.mp3"
+];
+
+self.addEventListener("install", event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(urlsToCache))
   );
 });
 
-self.addEventListener("fetch", e => {
-  e.respondWith(
-    caches.match(e.request).then(response => {
-      return response || fetch(e.request);
-    })
+self.addEventListener("fetch", event => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => response || fetch(event.request))
   );
 });
